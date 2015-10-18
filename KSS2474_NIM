@@ -1,0 +1,191 @@
+.ORIG x3000
+;INITIALIZATION SEQUENCE
+
+A .STRINGZ "ROW A:"
+B .STRINGZ "ROW B:"
+C .STRINGZ "ROW C:"
+
+THREE .STRINGZ "ooo"
+FIVE  .STRINGZ "ooooo"
+EIGHT .STRINGZ "oooooooo"
+
+INITIAL		LEA R0, A
+		PUTS
+		AND R0, R0, #0
+
+		LEA R0, THREE
+		PUTS
+		AND R0, R0, #0
+		ADD R1, R1, #3		;r1 IS COUNTER FOR A
+
+		LEA R0, ENTER
+		PUTS
+		AND R0, R0, #0
+
+		LEA R0, B
+		PUTS
+		AND R0, R0, #0
+		
+		LEA R0, FIVE
+		PUTS
+		AND R0, R0, #0
+		ADD R2, R2, #5		;R2 IS COUNTER FOR B
+
+		LEA R0, ENTER
+		PUTS
+		AND R0, R0, #0
+
+		LEA R0, C
+		PUTS
+		AND R0, R0, #0	
+
+		LEA R0, EIGHT
+		PUTS
+		AND R0, R0, #0
+		ADD R3, R3, #8		;R3 IS COUNTER FOR C
+
+		LEA R0, ENTER
+		PUTS
+		AND R0, R0, #0
+
+		ADD R7, R7, 1
+		BRp PLAYER1
+
+;END INITIALIZATION SEQUENCE
+	
+PLAYER2 	LEA R0, P2
+		PUTS
+		AND R0, R0, #0
+		ADD R7, R7, #-1
+		BRz RUN1
+
+
+PLAYER1		LEA R0, P1
+		PUTS
+		AND R0, R0, #0
+LETTER		LDI R0, KBS		;Loads status
+		BRzp LETTER 		;checks for an input
+		LDI R4, KBD		;Loads R4 with input 1
+		STI R4, DD		;Puts input 1 on screen
+		
+		
+		
+LETTERCK		LD R6, ATEST		;Is it A?
+		ADD R6, R6, R4		;
+		BRz ARES		;Jump if yes
+
+		LD R6, BTEST		;Is it B?
+		ADD R6, R6, R4
+		BRz BRES		;Jump if yes
+
+		LD R6, CTEST		;Is it C?
+		ADD R6, R6, R4
+		BRz CRES		;Jump if yes
+		BRnz ERROR
+
+
+ROCK		LDI R0, KBS		;Loads status
+		BRzp ROCK		;checks for an input
+		LDI R5, KBD		;Loads R5 with input 2
+		STI R5, DD		;Puts input 2 on screen
+
+CONVERT		LD R6, CONV		;R6 conversion constant
+		ADD R5, R5, R6		;converts
+
+		NOT R5, R5		;makes the input 2 a negative
+		ADD R5, R5, #1		;
+
+
+ARES		ADD R5, R5, R1
+
+
+BRES		ADD R5, R5, R2
+
+
+CRES		ADD R5, R5, R3
+
+		ADD R1, R1, #0
+		BRz N1
+		ADD R1, R1, #-1
+		BRz ONE	
+		ADD R1, R1, #-1
+		BRz TWO
+		ADD R1, R1, #-1
+		BRz THREE
+		
+N1		ADD R2, R2, #0
+		BRz N2
+		ADD R2, R2, #-1
+		BRz ONE
+		ADD R2, R2, #-1
+		BRz TWO
+		ADD R2, R2, #-1
+		BRz THREE
+		ADD R2, R2, #-1
+		BRz FOUR
+		ADD R2, R2, #-1
+		BRz FIVE
+		
+N2		ADD R3, R3, #0
+		BRz WIN
+		ADD R3, R3, #-1
+		BRz ONE
+		ADD R3, R3, #-1
+		BRz TWO
+		ADD R3, R3, #-1
+		BRz THREE
+		ADD R3, R3, #-1   
+		BRz FOUR
+		ADD R3, R3, #-1
+		BRz FIVE
+		ADD R3, R3, #-1
+		BRz SIX
+		ADD R3, R3, #-1
+		BRz SEVEN
+		ADD R3, R3, #-1
+		BRz EIGHT
+
+WIN		ADD R1, R1, #0
+		BRp NEXTPLAYER
+		ADD R2, R2, #0
+		BRp NEXTPLAYER
+		ADD R3, R3, #0
+		BRp NEXTPLAYER
+		
+		LEA R0, WINMES1
+		PUTS
+		BRnzp DONE
+	
+		LEA R0, WINMES2
+		PUTS
+		BRnzp DONE
+
+ERROR		AND R0, R0, #0
+		LEA R0, ERRORMES
+		PUTS
+		AND R0, R0, #0	;**
+		ADD R7, R7, #1
+		BRp PLAYER1
+		ADD R7, R7, #-2
+		BRnz PLAYER2
+DONE	 	ADD R0, R0, #0
+HALT
+ONE .STRINGZ "o"
+
+ENTER	.FILL xA
+KBS .FILL xFE00
+KBD .FILL xFE02
+DS .FILL xFE04
+DD .FILL xFE06
+ERRORMES .STRINGZ "Invalid move. Try again."
+P1 .STRINGZ "Player 1, choose a row and number of rocks:"
+P2 .STRINGZ "Player 2, choose a row and number of rocks:"
+
+LOWER	.FILL X-40 	;CANNOT BE 40
+UPPER	.FILL X-44 	;CANNOT BE 44
+ATEST	.FILL X-41
+BTEST	.FILL X-42
+CTEST	.FILL X-43
+CONV	.FILL x-30
+
+.END
